@@ -14,6 +14,8 @@ import FirebaseAuth
 
 class RegistrationScreenViewController: UIViewController {
     
+    //MARK: - UI elements section
+    
     let plusPhotoButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "plus_photo")?.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -26,6 +28,7 @@ class RegistrationScreenViewController: UIViewController {
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
+        tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         return tf
     }()
     
@@ -35,6 +38,7 @@ class RegistrationScreenViewController: UIViewController {
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
+        tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         return tf
     }()
     
@@ -45,6 +49,7 @@ class RegistrationScreenViewController: UIViewController {
         tf.borderStyle = .roundedRect
         tf.font = UIFont.systemFont(ofSize: 14)
         tf.isSecureTextEntry = true
+        tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         return tf
     }()
     
@@ -53,18 +58,28 @@ class RegistrationScreenViewController: UIViewController {
         button.setTitle("Sing Up", for: .normal)
         button.layer.cornerRadius = 4
         button.setTitleColor(.white, for: .normal)
-//        button.backgroundColor = UIColor(red: 149/255, green: 204/255, blue: 244/255, alpha: 1)
         button.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
         button.addTarget(self, action: #selector(handleSingUp), for: .touchUpInside)
+        button.isEnabled = false
         return button
     }()
     
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        setupView()
+    }
+    
+    //MARK: - Firebase - create a new user
+    
     @objc fileprivate func handleSingUp() {
-        let email = "dummy@gmail.com"
-        let pass = "123456"
+        guard let email = emailTextField.text, email.count > 0 else { return }
+        guard let username = usernameTextField.text, username.count > 0 else { return }
+        guard let password = passwordTextField.text, password.count > 0 else { return }
         
-        Auth.auth().createUser(withEmail: email, password: pass) { (authInfo, error) in
+        Auth.auth().createUser(withEmail: email, password: password) { (authInfo, error) in
             if let error = error {
                 print("Error while creating new user", error)
                 return
@@ -73,12 +88,22 @@ class RegistrationScreenViewController: UIViewController {
         }
     }
     
+    //MARK: - Text fields validation
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        setupView()
+    @objc fileprivate func handleTextInputChange() {
+        guard let email = emailTextField.text else { return }
+        guard let username = usernameTextField.text else { return }
+        guard let password = passwordTextField.text else { return }
+        
+        if email.count > 0 && username.count > 0 && password.count > 0 {
+            singUpButton.backgroundColor = UIColor.rgb(red: 17, green: 154, blue: 237)
+            singUpButton.isEnabled = true
+        } else {
+            singUpButton.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
+            singUpButton.isEnabled = false
+        }
     }
+    
     
     fileprivate func setupView() {
         let verticalStackView = UIStackView(arrangedSubviews: [emailTextField,
