@@ -1,0 +1,6 @@
+framework module Pods_InstagramFirebase_App {
+  umbrella header "Pods-InstagramFirebase App-umbrella.h"
+
+  export *
+  module * { export * }
+}
